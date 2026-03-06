@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kini's Arcade</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+background:black;
+color:#00ffcc;
+font-family:'Press Start 2P', monospace;
+overflow:hidden;
+}
+
+#crt::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:repeating-linear-gradient(
+transparent,
+transparent 2px,
+rgba(0,0,0,0.2) 4px
+);
+pointer-events:none;
+}
+
+#topbar{
+position:absolute;
+top:10px;
+left:10px;
+right:10px;
+display:flex;
+justify-content:space-between;
+font-size:12px;
+}
+
+#arcade{
+width:100vw;
+height:100vh;
+position:relative;
+}
+
+.machine{
+position:absolute;
+width:140px;
+height:140px;
+border:3px solid #00ffcc;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+font-size:9px;
+cursor:pointer;
+background:#020202;
+}
+
+.machine:hover{
+background:#0a0a0a;
+}
+
+#player{
+position:absolute;
+width:25px;
+height:25px;
+background:#00ffcc;
+bottom:50px;
+left:50px;
+}
+
+#screen{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:650px;
+height:480px;
+background:#000;
+border:5px solid #00ffcc;
+display:none;
+padding:20px;
+overflow:auto;
+}
+
+button{
+background:black;
+border:2px solid #00ffcc;
+color:#00ffcc;
+padding:10px;
+margin-top:15px;
+cursor:pointer;
+}
+
+input,select{
+margin-top:10px;
+background:black;
+border:1px solid #00ffcc;
+color:#00ffcc;
+padding:5px;
+}
+
+#leaderboard{
+position:absolute;
+right:20px;
+bottom:20px;
+font-size:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="crt"></div>
+
+<div id="topbar">
+<div>🕹 Kini's Arcade</div>
+<div>Coins: <span id="coins">3</span></div>
+</div>
+
+<div id="arcade">
+
+<div id="player"></div>
+
+<div class="machine" style="left:100px;top:120px" onclick="startGame('future')">🔮 Future Predictor</div>
+<div class="machine" style="left:300px;top:120px" onclick="startGame('brain')">🧠 Braincell Lab</div>
+<div class="machine" style="left:500px;top:120px" onclick="startGame('pigeon')">🐦 Pigeon Test</div>
+<div class="machine" style="left:700px;top:120px" onclick="startGame('life')">🎲 Life Engine</div>
+
+<div class="machine" style="left:100px;top:320px" onclick="startGame('toilet')">🧻 Toilet Fortune</div>
+<div class="machine" style="left:300px;top:320px" onclick="startGame('juice')">🧃 Juice IQ</div>
+<div class="machine" style="left:500px;top:320px" onclick="startGame('npc')">🗿 NPC Detector</div>
+<div class="machine" style="left:700px;top:320px" onclick="startGame('pizza')">🍕 Pizza Personality</div>
+
+<div class="machine" style="left:300px;top:520px" onclick="startGame('doom')">📱 Doom Scroll</div>
+<div class="machine" style="left:500px;top:520px" onclick="startGame('skill')">🎯 Skill Generator</div>
+
+</div>
+
+<div id="leaderboard">
+FAKE GLOBAL IQ<br>
+1. ElonSus – 182<br>
+2. NPC_443 – 171<br>
+3. JuiceKing – 168<br>
+4. RandomGuy – 166
+</div>
+
+<div id="screen"></div>
+
+<script>
+
+let coins=3
+let screen=document.getElementById("screen")
+
+const roasts=[
+"After analyzing your responses, the AI has concluded that humanity might have peaked already.",
+"The system reviewed your answers three times and is still disappointed.",
+"The AI predicted your future. It mostly involves snacks and questionable decisions.",
+"Our servers had to pause for a moment to process this level of nonsense.",
+"The future is unclear, but one thing is certain: productivity is not involved.",
+"The AI ran 9,000 simulations and every one ended with you scrolling reels at 3AM.",
+"The algorithm expected intelligence but instead discovered vibes.",
+"The AI attempted to understand your logic and immediately gave up.",
+"Your destiny appears to involve procrastination and random internet quizzes.",
+"The system checked your potential and quietly lowered its expectations.",
+"The AI has filed your answers under 'unexplainable behavior'.",
+"Analysis complete. The AI would like to log off now."
+]
+
+function startGame(game){
+
+if(coins<=0){
+
+screen.style.display="block"
+
+screen.innerHTML=`
+<h2>OUT OF COINS</h2>
+<p>You need more coins to continue playing.</p>
+<p>Watch this to get more coins:</p>
+<a href="https://www.youtube.com/shorts/tXkoRhESq4w" target="_blank">
+GET FREE COINS
+</a>
+`
+
+return
+}
+
+coins--
+document.getElementById("coins").innerText=coins
+
+screen.style.display="block"
+
+if(game=="future") futureGame()
+if(game=="brain") brainGame()
+if(game=="pigeon") pigeonGame()
+if(game=="life") lifeGame()
+if(game=="toilet") toiletGame()
+if(game=="juice") juiceGame()
+if(game=="npc") npcGame()
+if(game=="pizza") pizzaGame()
+if(game=="doom") doomGame()
+if(game=="skill") skillGame()
+
+}
+
+function closeGame(){
+screen.style.display="none"
+}
+
+function randomRoast(){
+return roasts[Math.floor(Math.random()*roasts.length)]
+}
+
+function futureGame(){
+
+screen.innerHTML=`
+<h2>🔮 AI FUTURE PREDICTOR</h2>
+
+<p>Analyzing responses...</p>
+<p>Scanning brain activity...</p>
+<p>Checking honesty levels...</p>
+<p>⚠ Suspicious behavior detected...</p>
+<p>Lie detected in Question 2.</p>
+<p>Re-evaluating subject...</p>
+<p>Continuing analysis...</p>
+
+<button onclick="showRoast()">Reveal Future</button>
+`
+
+}
+
+function showRoast(){
+
+screen.innerHTML=`
+<h2>${randomRoast()}</h2>
+
+<p>This link might save your life:</p>
+
+<a href="https://www.youtube.com/shorts/tXkoRhESq4w" target="_blank">
+https://www.youtube.com/shorts/tXkoRhESq4w
+</a>
+
+<br><br>
+<button onclick="closeGame()">Exit Machine</button>
+`
+
+}
+
+function brainGame(){
+
+screen.innerHTML=`
+<h2>🧠 Braincell Calibration Lab</h2>
+
+<p>Step 1: Estimate active braincells</p>
+
+<input type="number" value="3">
+
+<p>Step 2: Choose thought type</p>
+
+<select>
+<option>Overthinking</option>
+<option>Random memes</option>
+<option>Snack planning</option>
+</select>
+
+<p>Step 3: Press calibration</p>
+
+<button onclick="showRoast()">Calibrate Brain</button>
+`
+
+}
+
+function pigeonGame(){
+
+screen.innerHTML=`
+<h2>🐦 Pigeon Loyalty Test</h2>
+
+<p>If a pigeon followed you for 6 days what do you do?</p>
+
+<select>
+<option>Promote it to assistant</option>
+<option>Start a cult</option>
+<option>Teach it taxes</option>
+</select>
+
+<p>How many pigeons are watching you right now?</p>
+
+<input type="number">
+
+<button onclick="showRoast()">Evaluate</button>
+`
+
+}
+
+function lifeGame(){
+
+screen.innerHTML=`
+<h2>🎲 Life Engine Simulator</h2>
+
+<p>Pick life difficulty</p>
+
+<select>
+<option>Easy NPC</option>
+<option>Confused Human</option>
+<option>Internet Goblin</option>
+</select>
+
+<p>Choose destiny</p>
+
+<select>
+<option>Influencer</option>
+<option>Snack reviewer</option>
+<option>Professional procrastinator</option>
+</select>
+
+<button onclick="showRoast()">Simulate Life</button>
+`
+
+}
+
+function toiletGame(){
+
+screen.innerHTML=`
+<h2>🧻 Toilet Fortune Machine</h2>
+
+<p>Choose toilet destiny</p>
+
+<select>
+<option>Wisdom seat</option>
+<option>Scroll throne</option>
+<option>Existential crisis booth</option>
+</select>
+
+<button onclick="showRoast()">Flush Future</button>
+`
+
+}
+
+function juiceGame(){
+
+screen.innerHTML=`
+<h2>🧃 Juice IQ Test</h2>
+
+<p>Which juice boosts intelligence?</p>
+
+<select>
+<option>Orange</option>
+<option>Mango</option>
+<option>Suspicious green juice</option>
+</select>
+
+<button onclick="showRoast()">Calculate IQ</button>
+`
+
+}
+
+function npcGame(){
+
+screen.innerHTML=`
+<h2>🗿 NPC Detector</h2>
+
+<p>Do you repeat phrases?</p>
+
+<select>
+<option>Bro</option>
+<option>Literally</option>
+<option>No cap</option>
+</select>
+
+<button onclick="showRoast()">Scan NPC Level</button>
+`
+
+}
+
+function pizzaGame(){
+
+screen.innerHTML=`
+<h2>🍕 Pizza Personality</h2>
+
+<p>Choose pizza destiny</p>
+
+<select>
+<option>Pineapple chaos</option>
+<option>Extra cheese</option>
+<option>Burnt edges</option>
+</select>
+
+<button onclick="showRoast()">Analyze</button>
+`
+
+}
+
+function doomGame(){
+
+screen.innerHTML=`
+<h2>📱 Doom Scroll Analyzer</h2>
+
+<p>Hours scrolling daily?</p>
+
+<input type="number">
+
+<button onclick="showRoast()">Analyze Damage</button>
+`
+
+}
+
+function skillGame(){
+
+screen.innerHTML=`
+<h2>🎯 Random Skill Generator</h2>
+
+<p>Press button to unlock skill</p>
+
+<button onclick="showRoast()">Generate Skill</button>
+`
+
+}
+
+</script>
+
+</body>
+</html>
