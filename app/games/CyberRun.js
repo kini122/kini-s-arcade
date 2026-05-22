@@ -6,49 +6,57 @@ import { useArcade } from '../context/ArcadeContext';
 
 const TOTAL_STEPS = 2;
 const GAME_WIDTH = 260;
-const GAME_HEIGHT = 280;
+const GAME_HEIGHT = 200;
+const GROUND_Y = 160;
 const PLAYER_SIZE = 20;
-const ASTEROID_SIZE = 15;
 
-export default function JuiceIQ() {
+export default function CyberRun() {
     const { closeGame, reportScore } = useArcade();
     const [step, setStep] = useState(0);
     const [score, setScore] = useState(0);
     const [isGameOver, setIsGameOver] = useState(false);
     const [gameStarted, setGameStarted] = useState(false);
+    
+    // Countdown state
     const [countdown, setCountdown] = useState(0);
 
-    // Game state for render
-    const [playerX, setPlayerX] = useState(GAME_WIDTH / 2 - PLAYER_SIZE / 2);
-    const [asteroids, setAsteroids] = useState([]);
+    // Player state
+    const [playerY, setPlayerY] = useState(GROUND_Y);
+    // Obstacle state
+    const [obstacleX, setObstacleX] = useState(GAME_WIDTH);
 
-    // Refs for game loop
-    const playerXRef = useRef(GAME_WIDTH / 2 - PLAYER_SIZE / 2);
-    const targetXRef = useRef(GAME_WIDTH / 2 - PLAYER_SIZE / 2);
-    const asteroidsRef = useRef([]);
+    const playerYRef = useRef(GROUND_Y);
+    const velocityYRef = useRef(0);
+    const isJumpingRef = useRef(false);
+
+    const obstacleXRef = useRef(GAME_WIDTH);
+    // SLOWED DOWN: Initial speed changed from 3 to 2
+    const speedRef = useRef(2); 
     const gameOverRef = useRef(false);
     const scoreRef = useRef(0);
-    const speedRef = useRef(4);
-    const spawnRateRef = useRef(30);
-    const frameCountRef = useRef(0);
 
     const animationRef = useRef(null);
 
     const startGame = () => {
         setScore(0);
         scoreRef.current = 0;
-        setAsteroids([]);
-        asteroidsRef.current = [];
-        frameCountRef.current = 0;
-        gameOverRef.current = false;
         setIsGameOver(false);
+        gameOverRef.current = false;
         setGameStarted(true);
         setStep(0);
-        speedRef.current = 4;
-        spawnRateRef.current = 30;
+        
+        setPlayerY(GROUND_Y);
+        playerYRef.current = GROUND_Y;
+        velocityYRef.current = 0;
+        isJumpingRef.current = false;
+
+        setObstacleX(GAME_WIDTH);
+        obstacleXRef.current = GAME_WIDTH;
+        speedRef.current = 2; // SLOWED DOWN
 
         if (animationRef.current) cancelAnimationFrame(animationRef.current);
-
+        
+        // Start countdown
         setCountdown(3);
         let currentCount = 3;
         const countInterval = setInterval(() => {
@@ -62,7 +70,7 @@ export default function JuiceIQ() {
     };
 
     const handleGameOver = () => {
-        reportScore(scoreRef.current);
+        if (typeof reportScore === 'function') reportScore(Math.floor(scoreRef.current / 10));
         setIsGameOver(true);
         gameOverRef.current = true;
         setGameStarted(false);
@@ -70,89 +78,71 @@ export default function JuiceIQ() {
         setTimeout(() => setStep(1), 1500);
     };
 
-    // Game Loop
+    const jump = () => {
+        if (!gameStarted || isGameOver || countdown > 0) return;
+        if (!isJumpingRef.current) {
+            isJumpingRef.current = true;
+            velocityYRef.current = -8; // Jump strength
+        }
+    };
+
     const gameLoop = () => {
         if (gameOverRef.current) return;
 
-        frameCountRef.current++;
-        let nextAsteroids = [...asteroidsRef.current];
+        // --- UPDATE PLAYER ---
+        if (isJumpingRef.current) {
+            playerYRef.current += velocityYRef.current;
+            velocityYRef.current += 0.4; // Gravity
 
-        // Player movement smoothing
-        if (Math.abs(playerXRef.current - targetXRef.current) > 1) {
-            playerXRef.current += (targetXRef.current - playerXRef.current) * 0.2;
-            setPlayerX(playerXRef.current);
-        }
-
-        // Spawn Asteroids
-        if (frameCountRef.current % spawnRateRef.current === 0) {
-            nextAsteroids.push({
-                id: Math.random().toString(),
-                x: Math.random() * (GAME_WIDTH - ASTEROID_SIZE),
-                y: -ASTEROID_SIZE,
-                passed: false
-            });
-        }
-
-        let hit = false;
-        const pX = playerXRef.current;
-        const pY = GAME_HEIGHT - PLAYER_SIZE - 10;
-
-        // Move Asteroids & Check Collisions
-        for (let i = 0; i < nextAsteroids.length; i++) {
-            let a = nextAsteroids[i];
-            a.y += speedRef.current;
-
-            // Collision AABB
-            if (
-                pX < a.x + ASTEROID_SIZE &&
-                pX + PLAYER_SIZE > a.x &&
-                pY < a.y + ASTEROID_SIZE &&
-                pY + PLAYER_SIZE > a.y
-            ) {
-                hit = true;
-            }
-
-            // Scoring
-            if (!a.passed && a.y > pY + PLAYER_SIZE) {
-                a.passed = true;
-                scoreRef.current += 10;
-                setScore(scoreRef.current);
-
-                // Increase difficulty
-                if (scoreRef.current % 300 === 0 && scoreRef.current > 0) {
-                    speedRef.current += 0.25;
-                    if (spawnRateRef.current > 20) spawnRateRef.current -= 3;
-                }
+            if (playerYRef.current >= GROUND_Y) {
+                playerYRef.current = GROUND_Y;
+                isJumpingRef.current = false;
+                velocityYRef.current = 0;
             }
         }
+        setPlayerY(playerYRef.current);
 
-        if (hit) {
+        // --- UPDATE OBSTACLE ---
+        obstacleXRef.current -= speedRef.current;
+        if (obstacleXRef.current < -20) {
+            obstacleXRef.current = GAME_WIDTH;
+            scoreRef.current += 100;
+            setScore(scoreRef.current);
+            // Speed up slightly
+            speedRef.current += 0.2;
+        }
+        setObstacleX(obstacleXRef.current);
+
+        // --- COLLISION CHECK ---
+        const pX = 40; // Fixed player X
+        const pY = playerYRef.current;
+        const oX = obstacleXRef.current;
+        const oY = GROUND_Y; // Obstacle is on ground
+
+        // Simple AABB collision
+        if (
+            pX < oX + 15 &&
+            pX + PLAYER_SIZE > oX &&
+            pY < oY + 20 &&
+            pY + PLAYER_SIZE > oY
+        ) {
             handleGameOver();
             return;
         }
 
-        nextAsteroids = nextAsteroids.filter(a => a.y < GAME_HEIGHT);
-        asteroidsRef.current = nextAsteroids;
-        setAsteroids(nextAsteroids);
-
         animationRef.current = requestAnimationFrame(gameLoop);
     };
 
-    // Mouse / Touch follow
-    const handleMove = (e) => {
-        if (!gameStarted || isGameOver || countdown > 0) return;
-        const rect = e.currentTarget.getBoundingClientRect();
-        let clientX = e.clientX;
-        if (e.touches && e.touches.length > 0) {
-            clientX = e.touches[0].clientX;
-        }
-        
-        let x = clientX - rect.left - PLAYER_SIZE / 2;
-        if (x < 0) x = 0;
-        if (x > GAME_WIDTH - PLAYER_SIZE) x = GAME_WIDTH - PLAYER_SIZE;
-        
-        targetXRef.current = x;
-    };
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.code === 'Space' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                jump();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [gameStarted, isGameOver, countdown]);
 
     useEffect(() => {
         return () => {
@@ -162,23 +152,21 @@ export default function JuiceIQ() {
 
     return (
         <div>
-            <h2 className="game-title">☄️ ASTEROID DODGE</h2>
+            <h2 className="game-title">🏃 CYBER RUN</h2>
             <StepIndicator total={TOTAL_STEPS} current={step} />
 
             {/* Step 0: Playing */}
             {step === 0 && (
                 <div className="game-step" style={{ padding: '0 10px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                        <span className="game-label">SCORE: {score}</span>
+                        <span className="game-label">DISTANCE: {score}</span>
                         <span className="game-label" style={{ color: isGameOver ? 'var(--neon-pink)' : 'var(--neon)' }}>
-                            {isGameOver ? 'IMPACT' : 'EVADING'}
+                            {isGameOver ? 'CRASHED' : 'RUNNING'}
                         </span>
                     </div>
 
                     <div 
-                        onMouseMove={handleMove}
-                        onTouchMove={handleMove}
-                        onTouchStart={handleMove}
+                        onClick={jump}
                         style={{
                             position: 'relative',
                             width: `${GAME_WIDTH}px`,
@@ -188,14 +176,14 @@ export default function JuiceIQ() {
                             border: `1px solid ${isGameOver ? 'var(--neon-pink)' : 'var(--neon)'}`,
                             overflow: 'hidden',
                             boxShadow: isGameOver ? '0 0 15px var(--neon-pink) inset' : '0 0 10px var(--neon) inset',
-                            cursor: 'none',
-                            touchAction: 'none'
+                            cursor: 'pointer',
+                            touchAction: 'none' // Prevent zooming on double tap
                         }}
                     >
                         {!gameStarted && !isGameOver && (
                             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, backgroundColor: 'rgba(0,0,0,0.6)' }}>
                                 <button className="btn btn-sm" onClick={(e) => { e.stopPropagation(); startGame(); }}>
-                                    LAUNCH
+                                    START RUN
                                 </button>
                             </div>
                         )}
@@ -208,38 +196,48 @@ export default function JuiceIQ() {
                             </div>
                         )}
 
+                        {/* Ground Line */}
+                        <div style={{
+                            position: 'absolute',
+                            bottom: `${GAME_HEIGHT - GROUND_Y - PLAYER_SIZE}px`,
+                            left: 0,
+                            width: '100%',
+                            height: '1px',
+                            backgroundColor: '#333'
+                        }} />
+
                         {/* Player */}
                         {(gameStarted || isGameOver) && (
                             <div style={{
                                 position: 'absolute',
-                                left: `${playerX}px`,
-                                bottom: '10px',
+                                left: '40px',
+                                top: `${playerY}px`,
                                 width: `${PLAYER_SIZE}px`,
                                 height: `${PLAYER_SIZE}px`,
                                 backgroundColor: 'var(--neon)',
                                 boxShadow: '0 0 10px var(--neon)',
-                                clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
+                                borderRadius: '4px'
                             }} />
                         )}
 
-                        {/* Asteroids */}
-                        {(gameStarted || isGameOver) && asteroids.map(a => (
-                            <div key={a.id} style={{
+                        {/* Obstacle */}
+                        {(gameStarted || isGameOver) && (
+                            <div style={{
                                 position: 'absolute',
-                                left: `${a.x}px`,
-                                top: `${a.y}px`,
-                                width: `${ASTEROID_SIZE}px`,
-                                height: `${ASTEROID_SIZE}px`,
+                                left: `${obstacleX}px`,
+                                top: `${GROUND_Y}px`,
+                                width: '15px',
+                                height: '20px',
                                 backgroundColor: 'var(--neon-pink)',
-                                boxShadow: '0 0 5px var(--neon-pink)',
-                                borderRadius: '50%'
+                                boxShadow: '0 0 10px var(--neon-pink)',
+                                clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' // Triangle spike
                             }} />
-                        ))}
+                        )}
 
                         {isGameOver && (
                             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,0,85,0.4)' }}>
                                 <span style={{ color: 'var(--neon-pink)', fontWeight: 'bold', fontSize: 24, letterSpacing: 2, textShadow: '0 0 10px var(--neon-pink)' }}>
-                                    HULL BREACH
+                                    WRECKED
                                 </span>
                             </div>
                         )}
@@ -247,7 +245,7 @@ export default function JuiceIQ() {
                     
                     {gameStarted && !isGameOver && (
                         <p style={{ textAlign: 'center', fontSize: '12px', color: '#666', marginTop: 10 }}>
-                            Drag or move mouse to evade
+                            Tap area or press SPACE to jump
                         </p>
                     )}
                 </div>
@@ -257,16 +255,16 @@ export default function JuiceIQ() {
             {step === 1 && (
                 <div className="game-step">
                     <div className="result-box">
-                        <div className="result-title">FLIGHT RECORD</div>
+                        <div className="result-title">RUN TERMINATED</div>
                         <div className="result-stat">{score}</div>
-                        <p className="result-text">Meters Survived</p>
+                        <p className="result-text">Meters Traveled</p>
                         <div className="result-breakdown" style={{ marginTop: 20 }}>
-                            Evasion Skill: {score < 500 ? 'Low' : score < 1500 ? 'Moderate' : 'Extreme'}<br/>
-                            Status: DESTROYED
+                            Agility: {score < 500 ? 'Sluggish' : score < 1500 ? 'Athletic' : 'Cybernetic'}<br/>
+                            Status: RECOVERING
                         </div>
                     </div>
                     <button className="btn" onClick={startGame} style={{ marginBottom: 12 }}>
-                        LAUNCH AGAIN
+                        RUN AGAIN
                     </button>
                     <button className="btn btn-pink" onClick={closeGame}>
                         EXIT MACHINE

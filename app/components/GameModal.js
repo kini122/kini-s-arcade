@@ -13,6 +13,12 @@ import NPCDetector from '../games/NPCDetector';
 import PizzaPersonality from '../games/PizzaPersonality';
 import DoomScroll from '../games/DoomScroll';
 import SkillGenerator from '../games/SkillGenerator';
+import CyberRun from '../games/CyberRun';
+import NeonFlap from '../games/NeonFlap';
+import BugSquasher from '../games/BugSquasher';
+import Grid2048 from '../games/Grid2048';
+import BrickBreaker from '../games/BrickBreaker';
+import NeonPlumber from '../games/NeonPlumber';
 
 const GAME_MAP = {
     future: FuturePredictor,
@@ -25,6 +31,12 @@ const GAME_MAP = {
     pizza: PizzaPersonality,
     doom: DoomScroll,
     skill: SkillGenerator,
+    cyberrun: CyberRun,
+    neonflap: NeonFlap,
+    bugsquasher: BugSquasher,
+    grid2048: Grid2048,
+    brickbreaker: BrickBreaker,
+    neonplumber: NeonPlumber
 };
 
 export default function GameModal() {

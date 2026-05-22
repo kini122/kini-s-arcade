@@ -1,109 +1,218 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import StepIndicator from '../components/StepIndicator';
 import { useArcade } from '../context/ArcadeContext';
 
-const FORTUNES = [
-    "Your future will unravel like cheap toilet paper.",
-    "The porcelain oracle sees greatness... in very small doses.",
-    "You will find unexpected wisdom in a bathroom stall.",
-    "The flush of destiny reveals: you need more fiber in your life.",
-    "The sacred roll predicts you will make a questionable decision today.",
-    "Your life trajectory is currently circling the drain. But in a fun way.",
-    "The toilet spirits say: invest in bidets.",
-    "Ancient toilet wisdom: he who scrolls too long gets leg cramps.",
-];
+const TOTAL_STEPS = 2;
+const MAX_GUESSES = 6;
+const DIGITS = [1, 2, 3, 4, 5, 6];
 
-const TOTAL_STEPS = 4;
-
-export default function ToiletFortune() {
-    const { closeGame } = useArcade();
+export default function CodeBreaker() {
+    const { closeGame, reportScore } = useArcade();
     const [step, setStep] = useState(0);
-    const [brand, setBrand] = useState('');
-    const [direction, setDirection] = useState('');
-    const [flushPhase, setFlushPhase] = useState(0);
-    const [fortune, setFortune] = useState('');
+    const [secretCode, setSecretCode] = useState([]);
+    const [guesses, setGuesses] = useState([]);
+    const [currentGuess, setCurrentGuess] = useState([]);
+    const [isGameOver, setIsGameOver] = useState(false);
+    const [isWin, setIsWin] = useState(false);
+    const [gameStarted, setGameStarted] = useState(false);
 
-    // Step 2: Flush animation
-    useEffect(() => {
-        if (step === 2) {
-            const phases = [1, 2, 3, 4];
-            phases.forEach((p, i) => {
-                setTimeout(() => setFlushPhase(p), (i + 1) * 800);
-            });
-            setTimeout(() => {
-                setFortune(FORTUNES[Math.floor(Math.random() * FORTUNES.length)]);
-                setStep(3);
-            }, 4000);
+    const generateUniqueCode = () => {
+        let code = [];
+        let available = [...DIGITS];
+        for (let i = 0; i < 3; i++) {
+            const idx = Math.floor(Math.random() * available.length);
+            code.push(available[idx]);
+            available.splice(idx, 1);
         }
-    }, [step]);
+        return code;
+    };
+
+    const startGame = () => {
+        setSecretCode(generateUniqueCode());
+        setGuesses([]);
+        setCurrentGuess([]);
+        setIsGameOver(false);
+        setIsWin(false);
+        setGameStarted(true);
+        setStep(0);
+    };
+
+    const handleDigitClick = (digit) => {
+        if (!gameStarted || isGameOver || currentGuess.length >= 3) return;
+        // In this version, we can let them guess repeats, but they probably shouldn't.
+        // Let's prevent them from typing the same digit twice in one guess to save them from themselves.
+        if (currentGuess.includes(digit)) return;
+        
+        setCurrentGuess([...currentGuess, digit]);
+    };
+
+    const handleBackspace = () => {
+        if (currentGuess.length > 0) {
+            setCurrentGuess(currentGuess.slice(0, -1));
+        }
+    };
+
+    const handleSubmit = () => {
+        if (currentGuess.length !== 3) return;
+
+        // Calculate feedback
+        let exactMatches = 0;
+        let colorMatches = 0;
+        
+        // Since digits are unique, logic is much simpler
+        for (let i = 0; i < 3; i++) {
+            if (currentGuess[i] === secretCode[i]) {
+                exactMatches++;
+            } else if (secretCode.includes(currentGuess[i])) {
+                colorMatches++;
+            }
+        }
+
+        const newGuess = {
+            guess: currentGuess,
+            exact: exactMatches,
+            color: colorMatches
+        };
+
+        const newGuesses = [...guesses, newGuess];
+        setGuesses(newGuesses);
+        setCurrentGuess([]);
+
+        if (exactMatches === 3) {
+            setIsWin(true);
+            setIsGameOver(true);
+            setTimeout(() => setStep(1), 1000);
+        } else if (newGuesses.length >= MAX_GUESSES) {
+            setIsGameOver(true);
+            setTimeout(() => setStep(1), 1000);
+        }
+    };
 
     return (
         <div>
-            <h2 className="game-title">🧻 TOILET FORTUNE</h2>
+            <h2 className="game-title">🔐 CODE BREAKER</h2>
             <StepIndicator total={TOTAL_STEPS} current={step} />
 
-            {/* Step 0: Brand */}
+            {/* Step 0: Playing */}
             {step === 0 && (
-                <div className="game-step">
-                    <p className="game-label">STEP 1: CHOOSE YOUR TP</p>
-                    <p className="game-text">Select your toilet paper destiny:</p>
-                    <div className="option-group">
-                        {['👑 Royal 3-Ply', '💰 Budget Single-Ply', '🌿 Organic Bamboo', '🗿 Mystery Brand'].map(opt => (
-                            <button key={opt} className="option-btn" onClick={() => { setBrand(opt); setStep(1); }}>
-                                {opt}
-                            </button>
-                        ))}
+                <div className="game-step" style={{ padding: '0 10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                        <span className="game-label">ATTEMPTS: {guesses.length}/{MAX_GUESSES}</span>
+                        <span className="game-label" style={{ color: 'var(--neon)' }}>UNIQUE DIGITS</span>
                     </div>
+
+                    {!gameStarted ? (
+                        <div style={{ minHeight: 250, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                            <p style={{ color: '#aaa', fontSize: 12, textAlign: 'center', marginBottom: 20, padding: '0 20px' }}>
+                                Crack the 3-digit code.<br/>Digits (1-6) DO NOT repeat.
+                            </p>
+                            <button className="btn" onClick={startGame}>START HACK</button>
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minHeight: 250 }}>
+                            {/* History */}
+                            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 5, paddingRight: 5 }}>
+                                {guesses.map((g, i) => (
+                                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0a0a0f', padding: '5px 10px', border: '1px solid #333' }}>
+                                        <div style={{ display: 'flex', gap: 10 }}>
+                                            {g.guess.map((d, idx) => (
+                                                <span key={idx} style={{ color: 'var(--neon)', fontWeight: 'bold' }}>{d}</span>
+                                            ))}
+                                        </div>
+                                        <div style={{ display: 'flex', gap: 5 }}>
+                                            {/* Exact matches */}
+                                            {Array.from({ length: g.exact }).map((_, idx) => (
+                                                <span key={`e-${idx}`} style={{ color: '#00ffcc', fontSize: 12 }} title="Right Digit, Right Place">✓</span>
+                                            ))}
+                                            {/* Color matches */}
+                                            {Array.from({ length: g.color }).map((_, idx) => (
+                                                <span key={`c-${idx}`} style={{ color: '#ffea00', fontSize: 12 }} title="Right Digit, Wrong Place">?</span>
+                                            ))}
+                                            {/* Misses */}
+                                            {Array.from({ length: 3 - g.exact - g.color }).map((_, idx) => (
+                                                <span key={`m-${idx}`} style={{ color: '#333', fontSize: 12 }}>X</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Current Input */}
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: 15, padding: '10px 0', borderTop: '1px solid var(--neon)', borderBottom: '1px solid var(--neon)' }}>
+                                {Array.from({ length: 3 }).map((_, i) => (
+                                    <div key={i} style={{ 
+                                        width: 30, 
+                                        height: 40, 
+                                        border: '1px solid var(--neon)', 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center',
+                                        fontSize: 20,
+                                        color: '#fff',
+                                        boxShadow: currentGuess[i] ? '0 0 5px var(--neon) inset' : 'none'
+                                    }}>
+                                        {currentGuess[i] || '-'}
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Keypad */}
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 5 }}>
+                                {DIGITS.map(d => (
+                                    <button 
+                                        key={d} 
+                                        onClick={() => handleDigitClick(d)}
+                                        disabled={isGameOver || currentGuess.length >= 3 || currentGuess.includes(d)}
+                                        style={{ backgroundColor: '#111', border: '1px solid #333', color: currentGuess.includes(d) ? '#444' : '#fff', padding: '10px 0', cursor: 'pointer' }}
+                                    >
+                                        {d}
+                                    </button>
+                                ))}
+                                <button 
+                                    onClick={handleBackspace}
+                                    disabled={isGameOver || currentGuess.length === 0}
+                                    style={{ backgroundColor: '#111', border: '1px solid #333', color: 'var(--neon-pink)', padding: '10px 0', cursor: 'pointer' }}
+                                >
+                                    DEL
+                                </button>
+                                <button 
+                                    onClick={handleSubmit}
+                                    disabled={isGameOver || currentGuess.length !== 3}
+                                    style={{ backgroundColor: '#111', border: '1px solid var(--neon)', color: 'var(--neon)', padding: '10px 0', cursor: 'pointer', gridColumn: 'span 2' }}
+                                >
+                                    SUBMIT
+                                </button>
+                            </div>
+                            
+                            <div style={{ textAlign: 'center', fontSize: 10, color: '#666' }}>
+                                <span style={{ color: '#00ffcc' }}>✓</span> Exact  &nbsp;&nbsp; <span style={{ color: '#ffea00' }}>?</span> Wrong Pos
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
-            {/* Step 1: Direction */}
+            {/* Step 1: Result */}
             {step === 1 && (
                 <div className="game-step">
-                    <p className="game-label">STEP 2: ROLL DIRECTION</p>
-                    <p className="game-text">This choice defines your soul:</p>
-                    <div className="option-group">
-                        {['➡️ Over (correct)', '⬅️ Under (chaotic)', '🔄 Sideways (unhinged)', '🚫 No holder (feral)'].map(opt => (
-                            <button key={opt} className="option-btn" onClick={() => { setDirection(opt); setStep(2); }}>
-                                {opt}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Step 2: Flush */}
-            {step === 2 && (
-                <div className="game-step">
-                    <p className="game-label">FLUSHING DESTINY</p>
-                    <div style={{ textAlign: 'center', fontSize: 48, margin: '20px 0' }}>
-                        {flushPhase === 0 && '[o]'}
-                        {flushPhase === 1 && '(*)'}
-                        {flushPhase === 2 && '(~)'}
-                        {flushPhase === 3 && '(@)'}
-                        {flushPhase === 4 && '(+)'}
-                    </div>
-                    <div className="scan-log">
-                        {flushPhase >= 1 && <div className="scan-log-line">Initiating sacred flush...</div>}
-                        {flushPhase >= 2 && <div className="scan-log-line" style={{ animationDelay: '0.1s' }}>Water spiraling clockwise...</div>}
-                        {flushPhase >= 3 && <div className="scan-log-line" style={{ animationDelay: '0.2s' }}>Reading porcelain omens...</div>}
-                        {flushPhase >= 4 && <div className="scan-log-line" style={{ animationDelay: '0.3s' }}>Fortune extracted!</div>}
-                    </div>
-                </div>
-            )}
-
-            {/* Step 3: Fortune */}
-            {step === 3 && (
-                <div className="game-step">
                     <div className="result-box">
-                        <div className="result-title">🧻 YOUR TOILET FORTUNE</div>
-                        <p className="result-text">{fortune}</p>
-                        <p className="result-text" style={{ fontSize: 11, opacity: 0.4, marginTop: 12 }}>
-                            TP: {brand} | Roll: {direction}
+                        <div className="result-title">{isWin ? 'ACCESS GRANTED' : 'ACCESS DENIED'}</div>
+                        <div className="result-stat" style={{ color: isWin ? 'var(--neon)' : 'var(--neon-pink)' }}>
+                            {isWin ? 'HACKED' : 'LOCKED'}
+                        </div>
+                        <p className="result-text">
+                            Secret code was: {secretCode.join('')}
                         </p>
+                        <div className="result-breakdown" style={{ marginTop: 20 }}>
+                            Attempts used: {guesses.length}/{MAX_GUESSES}<br/>
+                            Efficiency: {isWin ? `${Math.floor((1 - (guesses.length - 1)/MAX_GUESSES) * 100)}%` : '0%'}
+                        </div>
                     </div>
+                    <button className="btn" onClick={startGame} style={{ marginBottom: 12 }}>
+                        NEW TARGET
+                    </button>
                     <button className="btn btn-pink" onClick={closeGame}>
                         EXIT MACHINE
                     </button>
