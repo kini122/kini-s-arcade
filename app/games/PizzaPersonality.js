@@ -119,7 +119,7 @@ export default function DataMiner() {
     };
 
     const toggleFlag = (e, r, c) => {
-        e.preventDefault();
+        
         if (!gameStarted || isGameOver || grid[r][c].revealed) return;
 
         let newGrid = [...grid];

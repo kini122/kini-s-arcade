@@ -151,7 +151,7 @@ export default function NeonFlap() {
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.code === 'Space' || e.key === 'ArrowUp') {
-                e.preventDefault();
+                
                 flap();
             }
         };

@@ -7,7 +7,7 @@ const TOTAL_STEPS = 2;
 const W = 260, H = 280;
 const CX = W / 2, CY = H / 2;
 
-const BASE_BASE_PLANETS = [{id:0,orbitR:50,speed:0.025,color:'#ff4466',size:8,catchR:22},{id:1,orbitR:85,speed:0.015,color:'#ffea00',size:10,catchR:26},{id:2,orbitR:118,speed:0.009,color:'#00ffcc',size:12,catchR:30}];
+const BASE_PLANETS = [{id:0,orbitR:50,speed:0.025,color:'#ff4466',size:8,catchR:22},{id:1,orbitR:85,speed:0.015,color:'#ffea00',size:10,catchR:26},{id:2,orbitR:118,speed:0.009,color:'#00ffcc',size:12,catchR:30}];
 
 export default function OrbitCatch() {
   const { closeGame, reportScore } = useArcade();
@@ -165,7 +165,7 @@ export default function OrbitCatch() {
 
   useEffect(() => {
     const onKey = (e) => {
-      if (e.code === 'Space') { e.preventDefault(); release(); }
+      if (e.code === 'Space') { e.preventDefault();  release(); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -192,8 +192,7 @@ export default function OrbitCatch() {
           </div>
 
           <div
-            onClick={release}
-            onTouchStart={(e) => { e.preventDefault(); release(); }}
+            onPointerDown={release}
             style={{
               position: 'relative', width: W, height: H, margin: '0 auto',
               backgroundColor: '#020208',

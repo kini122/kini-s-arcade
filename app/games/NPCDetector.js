@@ -117,8 +117,8 @@ export default function QuantumSort() {
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (!gameStarted || isGameOver) return;
-            if (e.key === 'ArrowLeft' || e.key === 'a') handleSort(0);
-            if (e.key === 'ArrowRight' || e.key === 'd') handleSort(1);
+            if (e.key === 'ArrowLeft' || e.key === 'a') { e.preventDefault(); } handleSort(0);
+            if (e.key === 'ArrowRight' || e.key === 'd') { e.preventDefault(); } handleSort(1);
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);

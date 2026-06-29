@@ -539,6 +539,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  touch-action: manipulation;
   gap: 8px;
   padding: 12px 24px;
   font-family: var(--font-pixel);

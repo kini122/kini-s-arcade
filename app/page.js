@@ -10,9 +10,7 @@ import NicknameModal from './components/NicknameModal';
 const MACHINES_FEATURED = [
   { id: 'mergemania',  emoji: '🫧', title: 'Merge Mania',   desc: 'Bubble up, merge up, score up' },
   { id: 'voltdash',   emoji: '⚡', title: 'Volt Dash',     desc: 'One wrong tile and you\'re toast' },
-  { id: 'ricochet',   emoji: '🎯', title: 'Ricochet',      desc: 'Aim. Bounce. Annihilate.' },
-  { id: 'spintrap',   emoji: '🌀', title: 'Spin Trap',     desc: 'Spin fast or die slow' },
-  { id: 'skystack',   emoji: '🏗️', title: 'Sky Stack',     desc: 'One tap to glory or dust' },
+  { id: 'ricochet',   emoji: '🎯', title: 'Ricochet',      desc: 'Aim. Bounce. Annihilate.' },  { id: 'skystack',   emoji: '🏗️', title: 'Sky Stack',     desc: 'One tap to glory or dust' },
   { id: 'jugglerush', emoji: '🎪', title: 'Juggle Rush',   desc: 'Don\'t let them hit the floor' },
   { id: 'crowdsurge', emoji: '🔥', title: 'Crowd Surge',   desc: 'Lead the mob, pick the gate' },
   { id: 'orbitcatch', emoji: '🪐', title: 'Orbit Catch',   desc: 'Tap to hop between planets' },

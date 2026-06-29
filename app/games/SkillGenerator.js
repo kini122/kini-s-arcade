@@ -154,8 +154,8 @@ export default function SpaceDefender() {
     // Keyboard support
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.code === 'Space') {
-                e.preventDefault();
+            if (e.code === 'Space') { e.preventDefault();
+                
                 shoot();
             }
         };

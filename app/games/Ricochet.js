@@ -222,8 +222,7 @@ export default function Ricochet() {
   const handlePointerDown = (e) => {
     if (!gameStarted || gameOverRef.current || ballRef.current) return;
     if (shotsRef.current <= 0 && bonusShotsRef.current <= 0) return;
-    if (e.type === 'touchstart') e.preventDefault();
-    const pos = getCanvasPos(e);
+        const pos = getCanvasPos(e);
     isAimingRef.current = true;
     setIsAiming(true);
     aimStartRef.current = pos;
@@ -233,15 +232,13 @@ export default function Ricochet() {
 
   const handlePointerMove = (e) => {
     if (!isAimingRef.current) return;
-    if (e.type === 'touchmove') e.preventDefault();
-    const pos = getCanvasPos(e);
+        const pos = getCanvasPos(e);
     setAimLine({ x1: ballOrigin.x, y1: ballOrigin.y, x2: pos.x, y2: pos.y });
   };
 
   const handlePointerUp = (e) => {
     if (!isAimingRef.current) return;
-    if (e.type === 'touchend') e.preventDefault();
-    isAimingRef.current = false;
+        isAimingRef.current = false;
     setIsAiming(false);
     setAimLine(null);
 
@@ -467,7 +464,7 @@ export default function Ricochet() {
                   className="btn"
                   style={{ minHeight: 44, fontSize: 14 }}
                   onClick={startGame}
-                  onTouchStart={(e) => { e.preventDefault(); startGame(); }}
+                  
                 >
                   START
                 </button>
@@ -514,7 +511,7 @@ export default function Ricochet() {
               className="btn"
               style={{ minHeight: 44, marginTop: 4 }}
               onClick={startGame}
-              onTouchStart={(e) => { e.preventDefault(); startGame(); }}
+              
             >
               PLAY AGAIN
             </button>
@@ -538,7 +535,7 @@ export default function Ricochet() {
               className="btn"
               style={{ minHeight: 44 }}
               onClick={startGame}
-              onTouchStart={(e) => { e.preventDefault(); startGame(); }}
+              
             >
               PLAY AGAIN
             </button>
@@ -546,7 +543,7 @@ export default function Ricochet() {
               className="btn btn-pink"
               style={{ minHeight: 44 }}
               onClick={closeGame}
-              onTouchStart={(e) => { e.preventDefault(); closeGame(); }}
+              
             >
               EXIT MACHINE
             </button>

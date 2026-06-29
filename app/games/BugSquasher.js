@@ -209,8 +209,7 @@ export default function BugSquasher() {
                         {[...Array(9)].map((_, i) => (
                             <div 
                                 key={i}
-                                onMouseDown={() => hitBug(i)}
-                                onTouchStart={() => hitBug(i)}
+                                onPointerDown={() => hitBug(i)}
                                 style={{
                                     backgroundColor: '#111',
                                     border: '1px solid #222',

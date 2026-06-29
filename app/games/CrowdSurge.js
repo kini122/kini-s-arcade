@@ -214,8 +214,8 @@ export default function CrowdSurge() {
 
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'ArrowLeft' || e.key === 'a') steer('left');
-      if (e.key === 'ArrowRight' || e.key === 'd') steer('right');
+      if (e.key === 'ArrowLeft' || e.key === 'a') { e.preventDefault(); } steer('left');
+      if (e.key === 'ArrowRight' || e.key === 'd') { e.preventDefault(); } steer('right');
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -245,7 +245,7 @@ export default function CrowdSurge() {
 
           <div
             onClick={handleCanvasTap}
-            onTouchStart={(e) => { e.preventDefault(); handleCanvasTap(e); }}
+            onTouchStart={(e) => {  handleCanvasTap(e); }}
             style={{
               position: 'relative', width: W, height: H, margin: '0 auto',
               backgroundColor: '#050508',
@@ -337,9 +337,9 @@ export default function CrowdSurge() {
           {gameStarted && !isGameOver && countdown <= 0 && !showRoundComplete && (
             <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
               <button className="btn" style={{ flex: 1, padding: '14px 0' }}
-                onMouseDown={() => steer('left')} onTouchStart={(e) => { e.preventDefault(); steer('left'); }}>◀ LEFT</button>
+                onMouseDown={() => steer('left')} >◀ LEFT</button>
               <button className="btn" style={{ flex: 1, padding: '14px 0' }}
-                onMouseDown={() => steer('right')} onTouchStart={(e) => { e.preventDefault(); steer('right'); }}>RIGHT ▶</button>
+                onMouseDown={() => steer('right')} >RIGHT ▶</button>
             </div>
           )}
           {gameStarted && !isGameOver && countdown <= 0 && (

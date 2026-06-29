@@ -152,8 +152,7 @@ export default function ChainBlast() {
   }, []);
 
   const handleCellTap = useCallback((row, col, e) => {
-    if (e && e.type === 'touchstart') e.preventDefault();
-    if (phaseRef.current !== 'playing' || isAnimating || blastsRef.current <= 0 || gameOverRef.current) return;
+        if (phaseRef.current !== 'playing' || isAnimating || blastsRef.current <= 0 || gameOverRef.current) return;
 
     const cell = gridRef.current[row][col];
     if (!cell) return;
@@ -309,7 +308,7 @@ export default function ChainBlast() {
             className="btn"
             style={{ minHeight: 44 }}
             onClick={startGame}
-            onTouchStart={(e) => { e.preventDefault(); startGame(); }}
+            
           >
             PLAY AGAIN
           </button>
@@ -317,7 +316,7 @@ export default function ChainBlast() {
             className="btn btn-pink"
             style={{ minHeight: 44 }}
             onClick={closeGame}
-            onTouchStart={(e) => { e.preventDefault(); closeGame(); }}
+            
           >
             EXIT MACHINE
           </button>
@@ -370,7 +369,7 @@ export default function ChainBlast() {
             <div style={{ color: '#ffea00', fontSize: 13, fontFamily: 'monospace', textAlign: 'center', padding: '0 12px', lineHeight: 1.6 }}>
               TAP a bubble to BLAST it.<br/>Chain same-color neighbors!<br/><span style={{ color: '#ff6600' }}>5+ chain = ×2 bonus!</span>
             </div>
-            <button className="btn" style={{ minHeight: 44, fontSize: 14 }} onClick={startGame} onTouchStart={(e) => { e.preventDefault(); startGame(); }}>START BLAST</button>
+            <button className="btn" style={{ minHeight: 44, fontSize: 14 }} onClick={startGame} >START BLAST</button>
           </div>
         )}
         {gamePhase === 'roundEnd' && (
@@ -378,9 +377,9 @@ export default function ChainBlast() {
             <div style={{ color: '#ffea00', fontSize: 18, fontFamily: 'monospace', textShadow: '0 0 10px #ffea00' }}>ROUND {currentRound} DONE!</div>
             <div style={{ color: '#00ff88', fontSize: 14, fontFamily: 'monospace' }}>+{roundScore} pts</div>
             {currentRound < TOTAL_ROUNDS ? (
-              <button className="btn" style={{ minHeight: 44 }} onClick={startNextRound} onTouchStart={(e) => { e.preventDefault(); startNextRound(); }}>ROUND {currentRound + 1} →</button>
+              <button className="btn" style={{ minHeight: 44 }} onClick={startNextRound} >ROUND {currentRound + 1} →</button>
             ) : (
-              <button className="btn" style={{ minHeight: 44 }} onClick={handleGameOver} onTouchStart={(e) => { e.preventDefault(); handleGameOver(); }}>SEE RESULTS</button>
+              <button className="btn" style={{ minHeight: 44 }} onClick={handleGameOver} >SEE RESULTS</button>
             )}
           </div>
         )}

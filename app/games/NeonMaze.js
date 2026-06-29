@@ -13,7 +13,13 @@ function generateMaze(width, height) {
     maze[y][x] = 0;
     const dirs = [
       [0, -2], [2, 0], [0, 2], [-2, 0] // Up, Right, Down, Left
-    ].sort(() => Math.random() - 0.5);
+    ];
+    
+    // Fisher-Yates shuffle
+    for (let i = dirs.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [dirs[i], dirs[j]] = [dirs[j], dirs[i]];
+    }
 
     for (const [dx, dy] of dirs) {
       const nx = x + dx, ny = y + dy;
@@ -167,10 +173,10 @@ export default function NeonMaze() {
 
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'ArrowUp' || e.key === 'w') move(0, -1);
-      if (e.key === 'ArrowDown' || e.key === 's') move(0, 1);
-      if (e.key === 'ArrowLeft' || e.key === 'a') move(-1, 0);
-      if (e.key === 'ArrowRight' || e.key === 'd') move(1, 0);
+      if (e.key === 'ArrowUp' || e.key === 'w') { e.preventDefault(); } move(0, -1);
+      if (e.key === 'ArrowDown' || e.key === 's') { e.preventDefault(); } move(0, 1);
+      if (e.key === 'ArrowLeft' || e.key === 'a') { e.preventDefault(); } move(-1, 0);
+      if (e.key === 'ArrowRight' || e.key === 'd') { e.preventDefault(); } move(1, 0);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -305,11 +311,11 @@ export default function NeonMaze() {
           {/* Controls */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, width: 160, margin: '12px auto 0' }}>
             <div />
-            <button className="btn" style={{ padding: '8px 0', borderColor: '#00ffcc', color: '#00ffcc' }} onClick={() => move(0, -1)} onTouchStart={(e) => { e.preventDefault(); move(0, -1); }}>▲</button>
+            <button className="btn" style={{ padding: '8px 0', borderColor: '#00ffcc', color: '#00ffcc' }} onClick={() => move(0, -1)} >▲</button>
             <div />
-            <button className="btn" style={{ padding: '8px 0', borderColor: '#00ffcc', color: '#00ffcc' }} onClick={() => move(-1, 0)} onTouchStart={(e) => { e.preventDefault(); move(-1, 0); }}>◀</button>
-            <button className="btn" style={{ padding: '8px 0', borderColor: '#00ffcc', color: '#00ffcc' }} onClick={() => move(0, 1)} onTouchStart={(e) => { e.preventDefault(); move(0, 1); }}>▼</button>
-            <button className="btn" style={{ padding: '8px 0', borderColor: '#00ffcc', color: '#00ffcc' }} onClick={() => move(1, 0)} onTouchStart={(e) => { e.preventDefault(); move(1, 0); }}>▶</button>
+            <button className="btn" style={{ padding: '8px 0', borderColor: '#00ffcc', color: '#00ffcc' }} onClick={() => move(-1, 0)} >◀</button>
+            <button className="btn" style={{ padding: '8px 0', borderColor: '#00ffcc', color: '#00ffcc' }} onClick={() => move(0, 1)} >▼</button>
+            <button className="btn" style={{ padding: '8px 0', borderColor: '#00ffcc', color: '#00ffcc' }} onClick={() => move(1, 0)} >▶</button>
           </div>
         </div>
       )}

@@ -128,12 +128,12 @@ export default function Grid2048() {
             if (!gameStarted || isGameOver) return;
             // Prevent default scrolling for arrows
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-                e.preventDefault();
+                
             }
-            if (e.key === 'ArrowUp' || e.key === 'w') move('UP');
-            if (e.key === 'ArrowDown' || e.key === 's') move('DOWN');
-            if (e.key === 'ArrowLeft' || e.key === 'a') move('LEFT');
-            if (e.key === 'ArrowRight' || e.key === 'd') move('RIGHT');
+            if (e.key === 'ArrowUp' || e.key === 'w') { e.preventDefault(); } move('UP');
+            if (e.key === 'ArrowDown' || e.key === 's') { e.preventDefault(); } move('DOWN');
+            if (e.key === 'ArrowLeft' || e.key === 'a') { e.preventDefault(); } move('LEFT');
+            if (e.key === 'ArrowRight' || e.key === 'd') { e.preventDefault(); } move('RIGHT');
         };
         window.addEventListener('keydown', handleKeyDown, { passive: false });
         return () => window.removeEventListener('keydown', handleKeyDown);

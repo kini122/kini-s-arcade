@@ -192,10 +192,10 @@ export default function BrickBreaker() {
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (!gameStarted || isGameOver || countdown > 0) return;
-            if (e.key === 'ArrowLeft' || e.key === 'a') {
+            if (e.key === 'ArrowLeft' || e.key === 'a') { e.preventDefault(); } {
                 targetXRef.current = Math.max(0, targetXRef.current - 40);
             }
-            if (e.key === 'ArrowRight' || e.key === 'd') {
+            if (e.key === 'ArrowRight' || e.key === 'd') { e.preventDefault(); } {
                 targetXRef.current = Math.min(GAME_WIDTH - PADDLE_WIDTH, targetXRef.current + 40);
             }
         };

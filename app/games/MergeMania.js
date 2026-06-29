@@ -326,7 +326,7 @@ export default function MergeMania() {
                   className="btn"
                   style={{ minHeight: 44 }}
                   onClick={startGame}
-                  onTouchStart={(e) => { e.preventDefault(); startGame(); }}
+                  
                 >
                   START
                 </button>
@@ -369,7 +369,7 @@ export default function MergeMania() {
                   <button
                     key={c}
                     onClick={() => dropBubble(c)}
-                    onTouchStart={(e) => { e.preventDefault(); dropBubble(c); }}
+                    
                     style={{
                       width: CELL,
                       minHeight: 44,
@@ -423,7 +423,7 @@ export default function MergeMania() {
               className="btn"
               style={{ minHeight: 44 }}
               onClick={startGame}
-              onTouchStart={(e) => { e.preventDefault(); startGame(); }}
+              
             >
               PLAY AGAIN
             </button>
@@ -431,7 +431,7 @@ export default function MergeMania() {
               className="btn btn-pink"
               style={{ minHeight: 44 }}
               onClick={closeGame}
-              onTouchStart={(e) => { e.preventDefault(); closeGame(); }}
+              
             >
               EXIT MACHINE
             </button>

@@ -35,9 +35,12 @@ export default function VoltDash() {
   const lastTimeRef = useRef(null);
 
   // ── helpers ────────────────────────────────────────────────────────────────
-  function spawnRow(yPos) {
-    // 1-2 dead lanes per row
-    const deadCount = Math.random() < 0.5 ? 1 : 2;
+  function spawnRow(yPos, forceSafe = false) {
+    if (forceSafe) {
+      return Array.from({length: LANES}, (_, lane) => ({lane, y: yPos, alive: true}));
+    }
+    // 1 dead lane per row to make it simpler
+    const deadCount = 1;
     const deadLanes = new Set();
     while (deadLanes.size < deadCount) {
       deadLanes.add(Math.floor(Math.random() * LANES));
@@ -51,9 +54,9 @@ export default function VoltDash() {
 
   function initTiles() {
     const tiles = [];
-    // Pre-populate screen with rows from top
+    // Pre-populate screen with rows from top, ALL SAFE so player has runway
     for (let y = -TILE_H; y <= GAME_H + TILE_H; y += SPAWN_INTERVAL) {
-      tiles.push(...spawnRow(y));
+      tiles.push(...spawnRow(y, true));
     }
     tilesRef.current = tiles;
     nextSpawnYRef.current = -TILE_H - SPAWN_INTERVAL;
@@ -246,7 +249,7 @@ export default function VoltDash() {
     gameOverRef.current = false;
     scoreRef.current = 0;
     tilePassedCountRef.current = 0;
-    speedRef.current = 1.5;
+    speedRef.current = 1.0; // Slower start speed
     currentLaneRef.current = 1;
     lastTimeRef.current = null;
     setScore(0);
@@ -298,15 +301,13 @@ export default function VoltDash() {
 
   // ── lane switch ────────────────────────────────────────────────────────────
   const moveLeft = useCallback((e) => {
-    if (e && e.preventDefault) e.preventDefault();
-    if (phaseRef.current !== 'playing') return;
+        if (phaseRef.current !== 'playing') return;
     currentLaneRef.current = Math.max(0, currentLaneRef.current - 1);
     setDisplayLane(currentLaneRef.current);
   }, []);
 
   const moveRight = useCallback((e) => {
-    if (e && e.preventDefault) e.preventDefault();
-    if (phaseRef.current !== 'playing') return;
+        if (phaseRef.current !== 'playing') return;
     currentLaneRef.current = Math.min(LANES - 1, currentLaneRef.current + 1);
     setDisplayLane(currentLaneRef.current);
   }, []);
@@ -323,7 +324,7 @@ export default function VoltDash() {
 
   // ── canvas touch (split screen left/right) ─────────────────────────────────
   const handleCanvasTouch = useCallback((e) => {
-    e.preventDefault();
+    
     if (phaseRef.current !== 'playing') return;
     const rect = canvasRef.current.getBoundingClientRect();
     const touch = e.changedTouches[0];
@@ -372,8 +373,7 @@ export default function VoltDash() {
                 cursor: phase === 'playing' ? 'pointer' : 'default',
                 touchAction: 'none',
               }}
-              onClick={handleCanvasClick}
-              onTouchStart={handleCanvasTouch}
+              onPointerDown={handleCanvasTouch}
             />
 
             {/* START overlay */}
@@ -392,7 +392,7 @@ export default function VoltDash() {
                   className="btn"
                   style={{ minHeight: 44 }}
                   onClick={startGame}
-                  onTouchStart={(e) => { e.preventDefault(); startGame(); }}
+                  
                 >
                   START
                 </button>
@@ -418,16 +418,14 @@ export default function VoltDash() {
             <button
               className="btn"
               style={{ minHeight: 44, minWidth: 80, fontSize: 22 }}
-              onClick={moveLeft}
-              onTouchStart={moveLeft}
+              onPointerDown={moveLeft}
             >
               ◀
             </button>
             <button
               className="btn"
               style={{ minHeight: 44, minWidth: 80, fontSize: 22 }}
-              onClick={moveRight}
-              onTouchStart={moveRight}
+              onPointerDown={moveRight}
             >
               ▶
             </button>
@@ -454,7 +452,7 @@ export default function VoltDash() {
               className="btn"
               style={{ minHeight: 44 }}
               onClick={startGame}
-              onTouchStart={(e) => { e.preventDefault(); startGame(); }}
+              
             >
               PLAY AGAIN
             </button>
@@ -462,7 +460,7 @@ export default function VoltDash() {
               className="btn btn-pink"
               style={{ minHeight: 44 }}
               onClick={closeGame}
-              onTouchStart={(e) => { e.preventDefault(); closeGame(); }}
+              
             >
               EXIT MACHINE
             </button>

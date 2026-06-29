@@ -28,7 +28,6 @@ import NeonPlumber from '../games/NeonPlumber';
 import MergeMania from '../games/MergeMania';
 import VoltDash from '../games/VoltDash';
 import Ricochet from '../games/Ricochet';
-import SpinTrap from '../games/SpinTrap';
 import SkyStack from '../games/SkyStack';
 import JuggleRush from '../games/JuggleRush';
 import CrowdSurge from '../games/CrowdSurge';
@@ -58,9 +57,7 @@ const GAME_MAP = {
     // Featured
     mergemania: MergeMania,
     voltdash: VoltDash,
-    ricochet: Ricochet,
-    spintrap: SpinTrap,
-    skystack: SkyStack,
+    ricochet: Ricochet,    skystack: SkyStack,
     jugglerush: JuggleRush,
     crowdsurge: CrowdSurge,
     orbitcatch: OrbitCatch,

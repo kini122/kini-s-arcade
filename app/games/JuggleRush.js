@@ -250,7 +250,7 @@ export default function JuggleRush() {
   };
 
   const handleCanvasTouch = (e) => {
-    e.preventDefault();
+    
     const touch = e.changedTouches[0];
     if (touch) handleInteract(touch.clientX, touch.clientY);
   };
@@ -354,7 +354,7 @@ export default function JuggleRush() {
                   className="btn btn-pink"
                   style={{ minHeight: 44, padding: '10px 28px', fontSize: 14 }}
                   onClick={startGame}
-                  onTouchStart={(e) => { e.preventDefault(); startGame(); }}
+                  
                 >
                   START
                 </button>
@@ -436,7 +436,7 @@ export default function JuggleRush() {
               className="btn btn-pink"
               style={{ minHeight: 44, padding: '10px 22px' }}
               onClick={startGame}
-              onTouchStart={(e) => { e.preventDefault(); startGame(); }}
+              
             >
               PLAY AGAIN
             </button>
@@ -444,7 +444,7 @@ export default function JuggleRush() {
               className="btn"
               style={{ minHeight: 44, padding: '10px 22px' }}
               onClick={closeGame}
-              onTouchStart={(e) => { e.preventDefault(); closeGame(); }}
+              
             >
               EXIT MACHINE
             </button>

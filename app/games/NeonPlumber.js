@@ -150,14 +150,14 @@ export default function NeonPlumber() {
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (!gameStarted || isGameOver) return;
-            if (e.key === 'ArrowLeft' || e.key === 'a') keysRef.current.left = true;
-            if (e.key === 'ArrowRight' || e.key === 'd') keysRef.current.right = true;
+            if (e.key === 'ArrowLeft' || e.key === 'a') { e.preventDefault(); } keysRef.current.left = true;
+            if (e.key === 'ArrowRight' || e.key === 'd') { e.preventDefault(); } keysRef.current.right = true;
             if (e.key === 'ArrowUp' || e.key === 'w' || e.code === 'Space') keysRef.current.up = true;
         };
         const handleKeyUp = (e) => {
             if (!gameStarted || isGameOver) return;
-            if (e.key === 'ArrowLeft' || e.key === 'a') keysRef.current.left = false;
-            if (e.key === 'ArrowRight' || e.key === 'd') keysRef.current.right = false;
+            if (e.key === 'ArrowLeft' || e.key === 'a') { e.preventDefault(); } keysRef.current.left = false;
+            if (e.key === 'ArrowRight' || e.key === 'd') { e.preventDefault(); } keysRef.current.right = false;
             if (e.key === 'ArrowUp' || e.key === 'w' || e.code === 'Space') keysRef.current.up = false;
         };
         window.addEventListener('keydown', handleKeyDown);

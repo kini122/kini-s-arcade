@@ -286,8 +286,7 @@ export default function FreezeTag() {
 
   // Freeze shape on tap
   const handleCellTap = useCallback((row, col, e) => {
-    if (e && e.type === 'touchstart') e.preventDefault();
-    if (phaseRef.current !== 'playing') return;
+        if (phaseRef.current !== 'playing') return;
     const cell = gridRef.current[row][col];
     if (!cell.color || cell.frozen) return;
 
@@ -411,7 +410,7 @@ export default function FreezeTag() {
             className="btn"
             style={{ minHeight: 44 }}
             onClick={startGame}
-            onTouchStart={(e) => { e.preventDefault(); startGame(); }}
+            
           >
             PLAY AGAIN
           </button>
@@ -419,7 +418,7 @@ export default function FreezeTag() {
             className="btn btn-pink"
             style={{ minHeight: 44 }}
             onClick={closeGame}
-            onTouchStart={(e) => { e.preventDefault(); closeGame(); }}
+            
           >
             EXIT MACHINE
           </button>
@@ -521,7 +520,7 @@ export default function FreezeTag() {
               className="btn"
               style={{ minHeight: 44, fontSize: 14 }}
               onClick={startGame}
-              onTouchStart={(e) => { e.preventDefault(); startGame(); }}
+              
             >
               START GAME
             </button>

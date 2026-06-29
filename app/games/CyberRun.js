@@ -136,7 +136,7 @@ export default function CyberRun() {
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.code === 'Space' || e.key === 'ArrowUp') {
-                e.preventDefault();
+                
                 jump();
             }
         };
